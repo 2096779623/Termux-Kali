@@ -1,18 +1,12 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#/data/data/com.termux/files/usr/bin/bash
 
-echo
-echo -e "\e[93mThis script will install Kali Linux in Termux."
-echo
-echo -e "\e[32m[*] \e[34mChecking for RootFS..."
+
+
 folder="kali-fs"
-if [ -d $folder ]; then
-	skip=1
-	echo -e "\e[32m[*] \e[34mRootFS is already downloaded, skipping download..."
-fi
 tarball="kali-rootfs.tar.xz"
 if [ "$skip" != 1 ]; then
 	if [ ! -f $tarball ]; then
-		echo -e "\e[32m[*] \e[34mDetecting CPU architecture..."
+		echo -e "\e[32m[*] \e[34m检测架构..."
 		case $(dpkg --print-architecture) in
 		aarch64)
 			archurl="arm64" ;;
@@ -27,23 +21,23 @@ if [ "$skip" != 1 ]; then
 		x86)
 			archurl="i386" ;;
 		*)
-			echo; echo -e "\e[91mDetected unsupported CPU architecture!"; echo; exit 1 ;;
+			echo; echo -e "\e[91m未知架构！"; echo; exit 1 ;;
 		esac
-		echo -e "\e[32m[*] \e[34mDownloading RootFS (~70Mb) for ${archurl}..."
-		wget "https://raw.githubusercontent.com/EXALAB/AnLinux-Resources/master/Rootfs/Kali/${archurl}/kali-rootfs-${archurl}.tar.xz" -O $tarball -q
+		echo -e "\e[32m[*] \e[34m下载${archurl}架构的Rootfs..."
+		wget "https://raw.fastgit.org/EXALAB/AnLinux-Resources/master/Rootfs/Kali/${archurl}/kali-rootfs-${archurl}.tar.xz" -O $tarball -q
 	fi
 	cur=$(pwd)
 	mkdir -p "$folder"
 	cd "$folder"
-	echo -e "\e[32m[*] \e[34mDecompressing RootFS..."
-	proot --link2symlink tar -xf ${cur}/${tarball} || (echo -e "\e[91mFailed to decompress RootFS!"; echo; exit 1)
+	echo -e "\e[32m[*] \e[34m解压Rootfs..."
+	proot --link2symlink tar -xf ${cur}/${tarball} || (echo -e "\e[91m未能解压Rootfs!"; echo; exit 1)
 	cd "$cur"
 fi
 mkdir -p kali-binds
 bin="start-kali.sh"
-echo -e "\e[32m[*] \e[34mCreating startup script..."
+echo -e "\e[32m[*] \e[34m创建启动脚本..."
 cat > $bin <<- EOM
-#!/data/data/com.termux/files/usr/bin/bash
+#/data/data/com.termux/files/usr/bin/bash
 
 cd \$(dirname \$0)
 ## unset LD_PRELOAD in case termux-exec is installed
@@ -69,6 +63,7 @@ command+=" /usr/bin/env -i"
 command+=" HOME=/root"
 command+=" PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games"
 command+=" TERM=\$TERM"
+command+=" TZ=Asia/Shanghai"
 command+=" LANG=C.UTF-8"
 command+=" /bin/bash --login"
 com="\$@"
@@ -78,12 +73,12 @@ else
     \$command -c "\$com"
 fi
 EOM
-echo -e "\e[32m[*] \e[34mConfiguring Shebang..."
+echo -e "\e[32m[*] \e[34m配置Shebang..."
 termux-fix-shebang $bin
-echo -e "\e[32m[*] \e[34mSetting execution permissions..."
+echo -e "\e[32m[*] \e[34m设置可执行目录权限..."
 chmod +x $bin
-echo -e "\e[32m[*] \e[34mRemoving RootFS image..."
+echo -e "\e[32m[*] \e[34m删除下载的rootfs镜像..."
 rm -rf $tarball
 echo
-echo -e "\e[32mKali Linux was successfully installed!\e[39m"
-echo -e "\e[32mYou can now launch it by executing ./${bin} command.\e[39m"
+echo -e "\e[32mKali Linux安装成功!\e[39m"
+echo -e "\e[32m你可以使用./${bin} 启动Kali Linux！.\e[39m"
