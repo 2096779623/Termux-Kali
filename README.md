@@ -14,4 +14,4 @@
 只需将此代码复制并粘贴到 Termux 命令行即可安装 Kali Linux：<br/>
 ```pkg install wget proot -y && wget https://raw.fastgit.org/2096779623/Termux-Kali/master/InstallKali.sh && bash InstallKali.sh```
 
-After installing run ```./start-kali.sh``` to launch Kali.
+安装后运行```./start-kali.sh``` 来启动Kali Linux。
